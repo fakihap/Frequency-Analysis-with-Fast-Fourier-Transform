@@ -2,8 +2,8 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { Line } from 'react-chartjs-2'
-import faker from 'faker'
 import { fft, ifft } from 'fft-js'
+import {fftRadix2, ifftRadix2} from '../fft/fft-r2'
 
 import {
   Chart as ChartJS,
@@ -36,32 +36,43 @@ export default function Home() {
       },
       title: {
         display: true,
-        text: 'Chart.js Line Chart',
+        text: 'Wave Frequency Analysis',
       },
     },
   };
 
   var labels = []
-  var sinee = []
+  var sinusoidWave = []
   for (let i = 0; i < 512; i++) {
     labels.push(i)
-    sinee.push(Math.sin(i / 180 * Math.PI ))
+    sinusoidWave.push(Math.sin(3 * i / 180 * Math.PI ) + Math.sin(i / 180 * Math.PI ))
   }
-  let daaaa = fft(sinee)
-  let daaaz = ifft(daaaa)
+  let dataR2 = fftRadix2(sinusoidWave)
+  let dataIR2 = ifftRadix2(dataR2)
+  
+
+  let dataF = fft(sinusoidWave)
+
+  console.log(dataF, dataR2)
 
 const data = {
           labels,
         datasets: [
           {
-            label: 'Dataset 1',
-            data: daaaa.map(e => Math.sqrt(e[0] * e[0] + e[1] * e[1])),
+            label: 'Fourier Frequency',
+            data: dataR2.map(e => Math.sqrt(e[0] * e[0] + e[1] * e[1])),
             borderColor: 'rgb(255, 99, 132)',
             backgroundColor: 'rgba(255, 99, 132, 0.5)',
           },
+          // {
+          //   label: 'Dataset 1',
+          //   data: dataF.map(e => Math.sqrt(e[0] * e[0] + e[1] * e[1])),
+          //   borderColor: 'rgb(255, 255, 132)',
+          //   backgroundColor: 'rgba(255, 99, 132, 0.5)',
+          // },
           {
-            label: 'Dataset 1',
-            data: sinee.map(e => e * 128),
+            label: 'Sinusoid Wave',
+            data: sinusoidWave.map(e => e * 128),
             borderColor: 'rgb(110, 99, 252)',
             backgroundColor: 'rgba(255, 99, 132, 0.5)',
           },
